@@ -76,6 +76,8 @@ double velocidadB = 0;
 SoftwareSerial xbee(rx, tx); 
 SimpleTimer timer;
 char movimiento = 0;
+char tA=0;
+char tB=0;
 
 //Inicializacion de elementos
 
@@ -86,10 +88,11 @@ void setup(){
     pinMode(sensorDerecha,INPUT);
     pinMode(sensorIzquierda,INPUT);
     pinMode(sensorTrasero,INPUT);
-    timer.setInterval(100,calcularVelocidad); 
+    timer.setInterval(3000,calcularVelocidad); 
     xbee.begin(9600);
     servoA.attach(9);
     servoB.attach(10);
+    Serial.begin(9600);
 }
 
 
@@ -98,9 +101,17 @@ void setup(){
 void loop(){
   
   /*
-  De acuerdo a la operacion del robot, se ha definido un esquema en el que se reciben comandos, se ejecutan, se
-  revisan los sensores, se toman acciones de correccion y se envian los datos
+  De acuerdo a la operacion del robot, se ha definido un esquema en el que se
+  revisan los sensores, se reciben comandos, se ejecutan, se toman acciones de correccion y se envian los datos
   */
+  
+  //Verificiacion de sensores
+  
+  //Velocidad
+  timer.run();
+  contarVueltasA();
+  contarVueltasB();
+  
   
   char rx = recepcionRX();
   
@@ -127,25 +138,32 @@ void loop(){
   }
   
   else if(rx==b){
-    //Recoger
+    //Depositoar
     depositar();
   }
-  /*
-  else if(rx==0x06){
-    //Botar
-    depositar();
+  else if(rx==r){
+    //recoger
+    recoger();
   }
-  */
-  //Verificiacion de sensores
+  
+  
 }
 
 //Calcula la velocidad angular
 void calcularVelocidad(){
-  velocidadA = 2*pi*cuentaA/0.1;
+  Serial.println("vueltas A: ");
+  Serial.println(cuentaA);
+  
+  Serial.println("vueltas B: ");
+  Serial.println(cuentaB);
+  
+  velocidadA = 2*pi*cuentaA/3;
   cuentaA=0;
   
-  velocidadB = 2*pi*cuentaB/0.1;
+  velocidadB = 2*pi*cuentaB/3;
   cuentaB=0;
+  
+  
 }
 
 //Calcula la corriente sensada segun la linealizacion
@@ -225,8 +243,8 @@ void moverAdelante(){
 void moverDerecha(){
   digitalWrite(M1,LOW);
   digitalWrite(M2,HIGH);
-  analogWrite(E1,pwm);
-  analogWrite(E2,pwm);
+  analogWrite(E1,0);
+  analogWrite(E2,255);
   movimiento = 1;
 
 }
@@ -234,8 +252,8 @@ void moverDerecha(){
 void moverIzquierda(){
   digitalWrite(M1,HIGH);
   digitalWrite(M2,LOW);
-  analogWrite(E1,pwm);
-  analogWrite(E2,pwm);
+  analogWrite(E1,255);
+  analogWrite(E2,0);
   movimiento = 1;
 
 }
@@ -262,6 +280,32 @@ void depositar(){
       else
       servoB.write(0);
    }
+}
+
+void contarVueltasA(){
+  int val = analogRead(sensorInfrarrojoA);
+  if(val>500 && tA){
+  cuentaA++;
+  tA = 0;
+  }
+              
+  if(val<100){
+    tA=1;
+  }
+  
+}
+
+void contarVueltasB(){
+  int val = analogRead(sensorInfrarrojoB);
+  if(val>500 && tB){
+  cuentaB++;
+  tB = 0;
+  }
+              
+  if(val<100){
+    tB=1;
+  }
+  
 }
 
 
