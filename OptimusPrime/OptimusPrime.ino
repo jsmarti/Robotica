@@ -219,7 +219,7 @@ void moverAdelante(){
   analogWrite(E1,pwm);
   analogWrite(E2,pwm);
   movimiento = 1;
-  //delay(3000);
+
 }
 
 void moverDerecha(){
@@ -228,7 +228,7 @@ void moverDerecha(){
   analogWrite(E1,pwm);
   analogWrite(E2,pwm);
   movimiento = 1;
-  //delay(3000);
+
 }
 
 void moverIzquierda(){
@@ -237,7 +237,7 @@ void moverIzquierda(){
   analogWrite(E1,pwm);
   analogWrite(E2,pwm);
   movimiento = 1;
-  //delay(3000);
+
 }
 
 void moverAtras(){
@@ -246,7 +246,7 @@ void moverAtras(){
   analogWrite(E1,pwm);
   analogWrite(E2,pwm);
   movimiento = 1;
-  //delay(3000);
+
 }
 
 void recoger(){
