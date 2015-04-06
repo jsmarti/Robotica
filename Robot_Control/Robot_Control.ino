@@ -15,14 +15,15 @@ Corriente -->A2
 
 //Constantes 
 const double pi = 3.1416;
-const int limInf = 100;
+const int limInf = 300;
 const int limSup = 500;
 double pwm = 200;
 double Kp = 0.205223358690436;
 double Ki = 0.39641582244666;
 double Kd = 0.0121427569545024;
 //Variable temporal!!! Caracterizar la velocidad:
-const double K = 8.6813;
+const double KA = 5.509;
+const double KB = 7.345;
 
 //Movimiento de Xbee
 char w = 'w';
@@ -71,9 +72,9 @@ int sensorCorriente = 2;
 
 //Variables globales
 double lecturaCorriente = 0;
-double lecturaUS1 = 0;
-double lecturaUS2 = 0;
-double lecturaUS3 = 0;
+double lecturaUSDerecha = 0;
+double lecturaUSIzquierda = 0;
+double lecturaUSAtras = 0;
 int lecturaInf1 = 0;
 int lecturaInf2 = 0;
 double cuentaA = 0;
@@ -101,7 +102,7 @@ void setup(){
     pinMode(sensorDerecha,INPUT);
     pinMode(sensorIzquierda,INPUT);
     pinMode(sensorTrasero,INPUT);
-    timer.setInterval(3000,calcularVelocidad); 
+    timer.setInterval(500,calcularVelocidad); 
     xbee.begin(9600);
     servoA.attach(9);
     servoB.attach(10);
@@ -129,57 +130,50 @@ void loop(){
   
   
   char rx = recepcionRX();
-  
-  if(rx==w){
+    if(rx==w){
     //Movimiento hacia adelante
     conversionVelocidad();
     moverAdelante();
-  }
-  else if(rx==d){
-    //Movimiento hacia la derecha
-    conversionVelocidad();
-    moverDerecha();
-  }
-  else if(rx==a){
-    //Movimiento hacia la izquierda
-    conversionVelocidad();
-    moverIzquierda();
-  }
-  else if(rx==s){
-    //Movimiento hacia atras
-    conversionVelocidad();
-    moverAtras();
-  }
-  else if(rx==p){
-  analogWrite(E1,0);
-  analogWrite(E2,0);
-  movimiento = 0;
-  }
-  
-  else if(rx==b){
-    //Depositoar
-    depositar();
-  }
-  else if(rx==r){
-    //recoger
-    recoger();
-  }
-  
+    }
+    else if(rx==d){
+      //Movimiento hacia la derecha
+      conversionVelocidad();
+      moverDerecha();
+    }
+    else if(rx==a){
+      //Movimiento hacia la izquierda
+      conversionVelocidad();
+      moverIzquierda();
+    }
+    else if(rx==s){
+      //Movimiento hacia atras
+      conversionVelocidad();
+      moverAtras();
+    }
+    else if(rx==p){
+    analogWrite(E1,0);
+    analogWrite(E2,0);
+    movimiento = 0;
+    }
+    
+    else if(rx==b){
+      //Depositoar
+      depositar();
+    }
+    else if(rx==r){
+      //recoger
+      recoger();
+    }
   
 }
 
 //Calcula la velocidad angular
 void calcularVelocidad(){
-  Serial.println("vueltas A: ");
-  Serial.println(cuentaA);
   
-  Serial.println("vueltas B: ");
-  Serial.println(cuentaB);
-  
-  velocidadA = 2*pi*cuentaA/3;
+  velocidadA = pi*cuentaA/0.5;
   cuentaA=0;
   
-  velocidadB = 2*pi*cuentaB/3;
+  velocidadB = pi*cuentaB/0.5;
   cuentaB=0;
   
   
@@ -193,7 +187,7 @@ double leerCorriente(){
    double voltajeMedido = analogRead(sensorCorriente);
    double conversion = voltajeMedido*5/1023;
    
-   //Estimacion y envio
+   //Estimacionc y envio
    return (conversion + 0.9997)/1.9821;
 }
 
@@ -261,6 +255,12 @@ void moverAdelante(){
 }
 
 void moverDerecha(){
+  lecturaUSDerecha = leerSensorDerecho();
+  if(lecturaUSDerecha <10){
+    Serial.print("Obstaculo a la derecha");
+    analogWrite(E1,0);
+    analogWrite(E2,0);
+  }
   digitalWrite(M1,LOW);
   digitalWrite(M2,HIGH);
   controlMotor1.Compute();
@@ -272,6 +272,12 @@ void moverDerecha(){
 }
 
 void moverIzquierda(){
+  lecturaUSIzquierda = leerSensorIzquierdo();
+  if(lecturaUSIzquierda <10){
+    Serial.print("Obstaculo a la izquierda");
+    analogWrite(E1,0);
+    analogWrite(E2,0);
+  }
   digitalWrite(M1,HIGH);
   digitalWrite(M2,LOW);
   controlMotor1.Compute();
@@ -283,6 +289,13 @@ void moverIzquierda(){
 }
 
 void moverAtras(){
+  lecturaUSAtras = leerSensorTrasero();
+  if(lecturaUSAtras <10){
+    Serial.print("Le va a dar!!");
+    analogWrite(E1,0);
+    analogWrite(E2,0);
+  }
+  else{
   digitalWrite(M1,LOW);
   digitalWrite(M2,LOW);
   controlMotor1.Compute();
@@ -290,6 +303,7 @@ void moverAtras(){
   analogWrite(E1,pwmMotor1);
   analogWrite(E2,pwmMotor2);
   movimiento = 1;
+  }
 
 }
 
@@ -339,8 +353,9 @@ void contarVueltasB(){
 //Realiza la conversion de radianes por segundo a pwm para el control de velocidad
 //Se hace para ambos motores
 void conversionVelocidad(){
-  encoder1 = K*velocidadA;
-  encoder2 = K*velocidadB;
+  encoder2 = KA*velocidadA;
+  encoder1 = KA*velocidadB;
+
 }
 
 
