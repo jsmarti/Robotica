@@ -64,9 +64,9 @@ int sensorCorriente = 2;
 
 //Variables globales
 double lecturaCorriente = 0;
-double lecturaUS1 = 0;
-double lecturaUS2 = 0;
-double lecturaUS3 = 0;
+double lecturaUSDerecha = 0;
+double lecturaUSIzquierda = 0;
+double lecturaUSAtras = 0;
 int lecturaInf1 = 0;
 int lecturaInf2 = 0;
 double cuentaA = 0;
@@ -241,29 +241,53 @@ void moverAdelante(){
 }
 
 void moverDerecha(){
+  lecturaUSDerecha = leerSensorDerecho();
+  if(lecturaUSDerecha <10){
+    Serial.print("Obstaculo a la derecha");
+    analogWrite(E1,0);
+    analogWrite(E2,0);
+  }
+  else{
   digitalWrite(M1,LOW);
   digitalWrite(M2,HIGH);
   analogWrite(E1,0);
   analogWrite(E2,255);
   movimiento = 1;
+  }
 
 }
 
 void moverIzquierda(){
+  lecturaUSIzquierda = leerSensorIzquierdo();
+  if(lecturaUSIzquierda <10){
+    Serial.print("Obstaculo a la izquierda");
+    analogWrite(E1,0);
+    analogWrite(E2,0);
+  }
+  else{
   digitalWrite(M1,HIGH);
   digitalWrite(M2,LOW);
   analogWrite(E1,255);
   analogWrite(E2,0);
   movimiento = 1;
+  }
 
 }
 
 void moverAtras(){
+  lecturaUSAtras = leerSensorTrasero();
+  if(lecturaUSAtras <10){
+    Serial.print("Le va a dar!!");
+    analogWrite(E1,0);
+    analogWrite(E2,0);
+  }
+  else{
   digitalWrite(M1,LOW);
   digitalWrite(M2,LOW);
   analogWrite(E1,pwm);
   analogWrite(E2,pwm);
   movimiento = 1;
+  }
 
 }
 
