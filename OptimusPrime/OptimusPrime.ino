@@ -292,7 +292,14 @@ void moverAtras(){
 }
 
 void recoger(){
-   
+   int lecturaServo = servoA.read();
+   xbee.print("Recoge");
+   if(!movimiento){
+     if(lecturaServo==0)
+       servoA.write(180);
+      else
+      servoA.write(0);
+   }
 }
 
 void depositar(){
