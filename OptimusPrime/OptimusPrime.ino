@@ -26,6 +26,7 @@ char a = 'a';
 char p = 'p';
 char r = 'r';
 char b = 'b';
+char u = 'u';
 //Nombramiento de pines
 
 //Motores
@@ -144,6 +145,10 @@ void loop(){
   else if(rx==r){
     //recoger
     recoger();
+  }
+  else if(rx==u){
+    //Pone la pala en posicion de recoger
+    posicionarPala();
   }
   
   
@@ -337,6 +342,17 @@ void contarVueltasB(){
     tB=1;
   }
   
+}
+
+void posicionarPala(){
+  int lecturaServo = servoB.read();
+   xbee.print("Deposita");
+   if(!movimiento){
+     if(lecturaServo==0)
+       servoB.write(25);
+      else
+      servoB.write(0);
+   }
 }
 
 

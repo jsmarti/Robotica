@@ -33,6 +33,7 @@ char a = 'a';
 char p = 'p';
 char r = 'r';
 char b = 'b';
+char u = 'u';
 
 //Nombramiento de pines
 
@@ -162,6 +163,10 @@ void loop(){
       //recoger
       recoger();
     }
+    else if(rx==u){
+    //Pone la pala en posicion de recoger
+    posicionarPala();
+  }
   
 }
 
@@ -306,10 +311,10 @@ void moverAtras(){
 }
 
 void recoger(){
-  int lecturaServo = servoA.read();
+  int lecturaServoA = servoA.read();
    xbee.print("Recoge");
    if(!movimiento){
-     if(lecturaServo==0)
+     if(lecturaServoA==0)
        servoA.write(180);
       else
       servoA.write(0);
@@ -362,6 +367,17 @@ void conversionVelocidad(){
   encoder2 = KA*velocidadA;
   encoder1 = KA*velocidadB;
 
+}
+
+void posicionarPala(){
+  int lecturaServo = servoB.read();
+   xbee.print("Deposita");
+   if(!movimiento){
+     if(lecturaServo==0)
+       servoB.write(25);
+      else
+      servoB.write(0);
+   }
 }
 
 
