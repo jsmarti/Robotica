@@ -93,7 +93,7 @@ void setup(){
     xbee.begin(9600);
     servoA.attach(9);
     servoB.attach(10);
-    Serial.begin(9600);
+    
 }
 
 
@@ -156,11 +156,6 @@ void loop(){
 
 //Calcula la velocidad angular
 void calcularVelocidad(){
-  Serial.println("vueltas A: ");
-  Serial.println(cuentaA);
-  
-  Serial.println("vueltas B: ");
-  Serial.println(cuentaB);
   
   velocidadA = 2*pi*cuentaA/3;
   cuentaA=0;
@@ -226,7 +221,6 @@ double leerSensorIzquierdo(){
   
   //Lectura del sensor y medicion de ancho de pulso
   double distancia = pulseIn(sensorIzquierda,HIGH);
-  
   //Estimacion y envio
   return 0.0169*distancia - 0.9637;
 }
@@ -238,26 +232,42 @@ char recepcionRX(){
 void moverAdelante(){
   digitalWrite(M1,HIGH);
   digitalWrite(M2,HIGH);
-  //Valor de PWM por determinar
+
+  int lecturaServoA = servoA.read();
+  int lecturaServoB = servoB.read();
+  
+  if(lecturaServoA==0 && lecturaServoB==0 ){
   analogWrite(E1,pwm);
   analogWrite(E2,pwm);
   movimiento = 1;
+  xbee.print("Movimiento hacia adelante");
+  }
+  else{
+  xbee.print("Posicionar pala y escoba");
+  }
 
 }
 
 void moverDerecha(){
   lecturaUSDerecha = leerSensorDerecho();
   if(lecturaUSDerecha <10){
-    Serial.print("Obstaculo a la derecha");
+    xbee.print("Obstaculo a la derecha");
     analogWrite(E1,0);
     analogWrite(E2,0);
   }
   else{
   digitalWrite(M1,LOW);
   digitalWrite(M2,HIGH);
-  analogWrite(E1,0);
+  int lecturaServoA = servoA.read();
+  int lecturaServoB = servoB.read();
+  if(lecturaServoA==0 && lecturaServoB==0 ){
+  analogWrite(E1,pwm);
   analogWrite(E2,255);
   movimiento = 1;
+  }
+  else{
+  xbee.print("Posicionar pala y escoba");
+  }
   }
 
 }
@@ -265,16 +275,25 @@ void moverDerecha(){
 void moverIzquierda(){
   lecturaUSIzquierda = leerSensorIzquierdo();
   if(lecturaUSIzquierda <10){
-    Serial.print("Obstaculo a la izquierda");
+    xbee.print("Obstaculo a la izquierda");
     analogWrite(E1,0);
     analogWrite(E2,0);
   }
   else{
+  
   digitalWrite(M1,HIGH);
   digitalWrite(M2,LOW);
+  
+  int lecturaServoA = servoA.read();
+  int lecturaServoB = servoB.read();
+  if(lecturaServoA==0 && lecturaServoB==0 ){
   analogWrite(E1,255);
-  analogWrite(E2,0);
+  analogWrite(E2,pwm);
   movimiento = 1;
+  }
+  else{
+  xbee.print("Posicionar pala y escoba");
+  }
   }
 
 }
@@ -282,39 +301,56 @@ void moverIzquierda(){
 void moverAtras(){
   lecturaUSAtras = leerSensorTrasero();
   if(lecturaUSAtras <10){
-    Serial.print("Le va a dar!!");
+    xbee.print("Obstaculo atras");
     analogWrite(E1,0);
     analogWrite(E2,0);
   }
   else{
   digitalWrite(M1,LOW);
   digitalWrite(M2,LOW);
+  int lecturaServoA = servoA.read();
+  int lecturaServoB = servoB.read();
+  if(lecturaServoA==0 && lecturaServoB==0 ){
   analogWrite(E1,pwm);
   analogWrite(E2,pwm);
   movimiento = 1;
+  }
+  else{
+  xbee.print("Posicionar pala y escoba");
+  }
   }
 
 }
 
 void recoger(){
    int lecturaServo = servoA.read();
-   xbee.print("Recoge");
    if(!movimiento){
      if(lecturaServo==0)
+     {
        servoA.write(180);
+       xbee.print("Recoge");
+     }
       else
+      {
       servoA.write(0);
+      xbee.print("Escoba en posicion de recoger");
+      }
    }
 }
 
 void depositar(){
    int lecturaServo = servoB.read();
-   xbee.print("Deposita");
    if(!movimiento){
      if(lecturaServo==0)
+     {
        servoB.write(180);
+       xbee.print("Deposita");
+     }
       else
+      {
       servoB.write(0);
+      xbee.print("Pala en posicion de movimiento");
+      }
    }
 }
 
@@ -346,12 +382,18 @@ void contarVueltasB(){
 
 void posicionarPala(){
   int lecturaServo = servoB.read();
-   xbee.print("Deposita");
+  xbee.print("Deposita");
    if(!movimiento){
      if(lecturaServo==0)
+     {
        servoB.write(25);
+       xbee.print("Pala en posicion de recoger");
+     }
       else
+      {
       servoB.write(0);
+      xbee.print("Pala en posicion de movimiento");
+      }
    }
 }
 

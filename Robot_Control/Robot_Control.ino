@@ -107,7 +107,6 @@ void setup(){
     servoB.attach(10);
     controlMotor1.SetMode(AUTOMATIC);
     controlMotor2.SetMode(AUTOMATIC);
-    Serial.begin(9600);
 }
 
 
@@ -260,7 +259,7 @@ void moverAdelante(){
 void moverDerecha(){
   lecturaUSDerecha = leerSensorDerecho();
   if(lecturaUSDerecha <10){
-    Serial.print("Obstaculo a la derecha");
+    xbee.print("Obstaculo a la derecha");
     analogWrite(E1,0);
     analogWrite(E2,0);
   }
@@ -277,7 +276,7 @@ void moverDerecha(){
 void moverIzquierda(){
   lecturaUSIzquierda = leerSensorIzquierdo();
   if(lecturaUSIzquierda <10){
-    Serial.print("Obstaculo a la izquierda");
+    xbee.print("Obstaculo a la izquierda");
     analogWrite(E1,0);
     analogWrite(E2,0);
   }
@@ -294,7 +293,7 @@ void moverIzquierda(){
 void moverAtras(){
   lecturaUSAtras = leerSensorTrasero();
   if(lecturaUSAtras <10){
-    Serial.print("Le va a dar!!");
+    xbee.print("Le va a dar!!");
     analogWrite(E1,0);
     analogWrite(E2,0);
   }
