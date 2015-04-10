@@ -382,7 +382,6 @@ void contarVueltasB(){
 
 void posicionarPala(){
   int lecturaServo = servoB.read();
-  xbee.print("Deposita");
    if(!movimiento){
      if(lecturaServo==0)
      {

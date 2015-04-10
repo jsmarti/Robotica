@@ -250,9 +250,16 @@ void moverAdelante(){
   digitalWrite(M2,HIGH);
   controlMotor1.Compute();
   controlMotor2.Compute();
+  int lecturaServoA = servoA.read();
+  int lecturaServoB = servoB.read();
+  if(lecturaServoA==0 && lecturaServoB==0 ){
   analogWrite(E1,pwmMotor1);
   analogWrite(E2,pwmMotor2);
   movimiento = 1;
+  }
+  else{
+  xbee.print("Posicionar pala y escoba");
+  }
 
 }
 
@@ -267,9 +274,16 @@ void moverDerecha(){
   digitalWrite(M2,HIGH);
   controlMotor1.Compute();
   controlMotor2.Compute();
-  analogWrite(E1,0);
+  int lecturaServoA = servoA.read();
+  int lecturaServoB = servoB.read();
+  if(lecturaServoA==0 && lecturaServoB==0 ){
+  analogWrite(E1,pwmMotor1);
   analogWrite(E2,pwmMotor2);
   movimiento = 1;
+  }
+  else{
+  xbee.print("Posicionar pala y escoba");
+  }
 
 }
 
@@ -284,9 +298,16 @@ void moverIzquierda(){
   digitalWrite(M2,LOW);
   controlMotor1.Compute();
   controlMotor2.Compute();
+  int lecturaServoA = servoA.read();
+  int lecturaServoB = servoB.read();
+  if(lecturaServoA==0 && lecturaServoB==0 ){
   analogWrite(E1,pwmMotor1);
-  analogWrite(E2,0);
+  analogWrite(E2,pwmMotor2);
   movimiento = 1;
+  }
+  else{
+  xbee.print("Posicionar pala y escoba");
+  }
 
 }
 
@@ -302,33 +323,49 @@ void moverAtras(){
   digitalWrite(M2,LOW);
   controlMotor1.Compute();
   controlMotor2.Compute();
+  int lecturaServoA = servoA.read();
+  int lecturaServoB = servoB.read();
+  if(lecturaServoA==0 && lecturaServoB==0 ){
   analogWrite(E1,pwmMotor1);
   analogWrite(E2,pwmMotor2);
   movimiento = 1;
+  }
+  else{
+  xbee.print("Posicionar pala y escoba");
+  }
   }
 
 }
 
 void recoger(){
-  int lecturaServoA = servoA.read();
-   xbee.print("Recoge");
+   int lecturaServo = servoA.read();
    if(!movimiento){
-     if(lecturaServoA==0)
+     if(lecturaServo==0)
+     {
        servoA.write(180);
+       xbee.print("Recoge");
+     }
       else
+      {
       servoA.write(0);
-   }
-   
+      xbee.print("Escoba en posicion de recoger");
+      }
+   } 
 }
 
 void depositar(){
    int lecturaServo = servoB.read();
-   xbee.print("Deposita");
    if(!movimiento){
      if(lecturaServo==0)
+     {
        servoB.write(180);
+       xbee.print("Deposita");
+     }
       else
+      {
       servoB.write(0);
+      xbee.print("Pala en posicion de movimiento");
+      }
    }
 }
 
@@ -370,12 +407,17 @@ void conversionVelocidad(){
 
 void posicionarPala(){
   int lecturaServo = servoB.read();
-   xbee.print("Deposita");
    if(!movimiento){
      if(lecturaServo==0)
+     {
        servoB.write(25);
+       xbee.print("Pala en posicion de recoger");
+     }
       else
+      {
       servoB.write(0);
+      xbee.print("Pala en posicion de movimiento");
+      }
    }
 }
 
