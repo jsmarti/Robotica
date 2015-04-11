@@ -22,14 +22,12 @@ void loop()
   //PWM
   int value = 200;
   //Sensado de corriente
-  double voltajeMedido = analogRead(sensorCorriente);
+  /*double voltajeMedido = analogRead(sensorCorriente);
   double conversion = voltajeMedido*5/1023;
   double corrienteSensada = conversion*1.9821-0.9997;
-  
+  */
   delay(1000);
 
-  //Proteccion
-  if(corrienteSensada <= 2.5){
     
   digitalWrite(M1,HIGH);
   digitalWrite(M2,HIGH);
@@ -41,12 +39,7 @@ void loop()
   analogWrite(E1,value);
   analogWrite(E2,value);
   delay(1000);
-  }
-  else{
-  Serial.print("Sobre Corriente");
-  analogWrite(E1,0);
-  delay(2000);
-  }
+
   
 
 }
