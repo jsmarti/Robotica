@@ -173,7 +173,7 @@ double leerCorriente(){
    double conversion = voltajeMedido*5/1023;
    
    //Estimacion y envio
-   return (conversion + 0.9997)/1.9821;
+   return (conversion - 0.427)/1.0035;
 }
 
 //Calcula la distancia sensada por el sensor trasero,
