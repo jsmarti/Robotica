@@ -133,6 +133,32 @@ void loop(){
   
   
   char rx = recepcionRX();
+  
+  lecturaCorriente = leerCorriente();
+  lecturaUSIzquierda = leerSensorIzquierdo();
+  lecturaUSDerecha = leerSensorDerecho();
+  lecturaUSAtras = leerSensorTrasero();
+  
+  if(lecturaUSDerecha <10){
+    xbee.println(String(lecturaCorriente) + ":" + "OD"+":");
+  }
+  else{
+    xbee.println(String(lecturaCorriente) + ":" + "LD"+":");
+  }
+  if(lecturaUSIzquierda <10){
+    xbee.println(String(lecturaCorriente) + ":" + "OI"+":");
+  }
+  else{
+    xbee.println(String(lecturaCorriente) + ":" + "LI"+":");
+  }
+  if(lecturaUSAtras <10){
+    xbee.println(String(lecturaCorriente) + ":" + "OT"+":");
+  }
+  else{
+    xbee.println(String(lecturaCorriente) + ":" + "LA"+":");
+  }
+  if(lecturaCorriente <= 2.5){
+    xbee.println(String(lecturaCorriente) + ":" + "CO"+":");
     if(rx==w){
     //Movimiento hacia adelante
     conversionVelocidad();
@@ -171,6 +197,10 @@ void loop(){
     //Pone la pala en posicion de recoger
     posicionarPala();
   }
+ }
+ else{
+    xbee.println(String(lecturaCorriente) + ":" + "SC"+":");
+  }
   
 }
 
@@ -194,8 +224,8 @@ double leerCorriente(){
    double voltajeMedido = analogRead(sensorCorriente);
    double conversion = voltajeMedido*5/1023;
    
-   //Estimacionc y envio
-   return (conversion + 0.9997)/1.9821;
+   //Estimacion y envio
+   return (conversion - 0.427)/1.0035;
 }
 
 //Calcula la distancia sensada por el sensor trasero,
@@ -251,6 +281,7 @@ char recepcionRX(){
 }
 
 void moverAdelante(){
+  
   digitalWrite(M1,HIGH);
   digitalWrite(M2,HIGH);
   controlMotor1.Compute();
@@ -261,20 +292,20 @@ void moverAdelante(){
   analogWrite(E1,pwmMotor1);
   analogWrite(E2,pwmMotor2);
   movimiento = 1;
+  xbee.println(String(lecturaCorriente) + ":" + "F"+":");
   }
   else{
-  xbee.print("Posicionar pala y escoba");
+  xbee.println(String(lecturaCorriente) + ":" + "PPE"+":");
   }
 
 }
 
 void moverDerecha(){
-  lecturaUSDerecha = leerSensorDerecho();
   if(lecturaUSDerecha <10){
-    xbee.print("Obstaculo a la derecha");
     analogWrite(E1,0);
     analogWrite(E2,0);
   }
+  else{
   digitalWrite(M1,LOW);
   digitalWrite(M2,HIGH);
   controlMotor1.Compute();
@@ -285,20 +316,21 @@ void moverDerecha(){
   analogWrite(E1,pwmMotor1);
   analogWrite(E2,pwmMotor2);
   movimiento = 1;
+  xbee.println(String(lecturaCorriente) + ":" + "D"+":");
   }
   else{
-  xbee.print("Posicionar pala y escoba");
+  xbee.println(String(lecturaCorriente) + ":" + "PPE"+":");
   }
+ }
 
 }
 
 void moverIzquierda(){
-  lecturaUSIzquierda = leerSensorIzquierdo();
   if(lecturaUSIzquierda <10){
-    xbee.print("Obstaculo a la izquierda");
     analogWrite(E1,0);
     analogWrite(E2,0);
   }
+  else{
   digitalWrite(M1,HIGH);
   digitalWrite(M2,LOW);
   controlMotor1.Compute();
@@ -309,17 +341,17 @@ void moverIzquierda(){
   analogWrite(E1,pwmMotor1);
   analogWrite(E2,pwmMotor2);
   movimiento = 1;
+  xbee.println(String(lecturaCorriente) + ":" + "I"+":");
   }
   else{
-  xbee.print("Posicionar pala y escoba");
+  xbee.println(String(lecturaCorriente) + ":" + "PPE"+":");
   }
+ }
 
 }
 
 void moverAtras(){
-  lecturaUSAtras = leerSensorTrasero();
   if(lecturaUSAtras <10){
-    xbee.print("Le va a dar!!");
     analogWrite(E1,0);
     analogWrite(E2,0);
   }
@@ -334,11 +366,12 @@ void moverAtras(){
   analogWrite(E1,pwmMotor1);
   analogWrite(E2,pwmMotor2);
   movimiento = 1;
+  xbee.println(String(lecturaCorriente) + ":" + "B"+":");
   }
   else{
-  xbee.print("Posicionar pala y escoba");
+  xbee.println(String(lecturaCorriente) + ":" + "PPE"+":");
   }
-  }
+ }
 
 }
 
@@ -348,12 +381,12 @@ void recoger(){
      if(lecturaServo==0)
      {
        servoA.write(180);
-       xbee.print("Recoge");
+       xbee.println(String(lecturaCorriente) + ":" + "R"+":");
      }
       else
       {
       servoA.write(0);
-      xbee.print("Escoba en posicion de recoger");
+      xbee.println(String(lecturaCorriente) + ":" + "MR"+":");
       }
    } 
 }
@@ -364,12 +397,12 @@ void depositar(){
      if(lecturaServo==0)
      {
        servoB.write(180);
-       xbee.print("Deposita");
+       xbee.println(String(lecturaCorriente) + ":" + "B"+":");
      }
       else
       {
       servoB.write(0);
-      xbee.print("Pala en posicion de movimiento");
+      xbee.println(String(lecturaCorriente) + ":" + "MB"+":");
       }
    }
 }
@@ -416,12 +449,12 @@ void posicionarPala(){
      if(lecturaServo==0)
      {
        servoB.write(25);
-       xbee.print("Pala en posicion de recoger");
+       xbee.println(String(lecturaCorriente) + ":" + "U"+":");
      }
       else
       {
       servoB.write(0);
-      xbee.print("Pala en posicion de movimiento");
+      xbee.println(String(lecturaCorriente) + ":" + "MU"+":");
       }
    }
 }
