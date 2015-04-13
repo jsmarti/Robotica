@@ -18,9 +18,14 @@ const double pi = 3.1416;
 const int limInf = 300;
 const int limSup = 500;
 double pwm = 200;
-double Kp = 0.205223358690436;
+
+/*double Kp = 0.205223358690436;
 double Ki = 0.39641582244666;
 double Kd = 0.0121427569545024;
+*/
+double Kp = 0.0107970606150557;
+double Ki = 0.0020491539321228;
+double Kd = 0.0126403024780752;
 //Variable temporal!!! Caracterizar la velocidad:
 const double KA = 5.509;
 const double KB = 7.345;
