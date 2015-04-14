@@ -135,7 +135,7 @@ void loop(){
   char rx = recepcionRX();
     
   lecturaCorriente  = leerCorriente();
-  if(lecturaCorriente <= 4){
+  if(0 <= 4){
     //xbee.println(String(lecturaCorriente) + ":" + "CO"+":");
     if(rx == w){
     //Movimiento hacia adelante

@@ -16,7 +16,7 @@ Corriente -->A2
 const double pi = 3.1416;
 const int limInf = 200;
 const int limSup = 900;
-const int pwm = 200;
+int pwm = 200;
 
 //Movimiento de Xbee
 char w = 'w';
@@ -78,6 +78,7 @@ double velocidadB = 0;
 SoftwareSerial xbee(rx, tx); 
 SimpleTimer timer;
 char movimiento = 0;
+char atras = 0;
 char tA=0;
 char tB=0;
 
@@ -114,18 +115,30 @@ void loop(){
   contarVueltasA();
   contarVueltasB();
   
-  char rx = recepcionRX();
+  char rx = recepcionRX();    
     if(rx==p){
       analogWrite(E1,0);
       analogWrite(E2,0);
       movimiento = 0;
-      xbee.println(String(lecturaCorriente) + ":" + "P"+":");
+      xbee.println(String(lecturaCorriente) + ":" + "P"+":"+String((velocidadA)/2));
     }
-    
-  lecturaCorriente = leerCorriente();  
-  if(lecturaCorriente <= 4){
 
-    if(rx==w){
+  lecturaCorriente = leerCorriente()/2;  
+  if(lecturaCorriente <= 3){
+    
+    if(rx=='1'){
+      pwm=100;
+      xbee.println(String(lecturaCorriente) + ":" + "1"+":"+String((velocidadA)/2));
+    }
+    else if(rx == '2'){
+      pwm=150;
+      xbee.println(String(lecturaCorriente) + ":" + "2"+":"+String((velocidadA)/2));
+    }
+    else if(rx == '3'){
+      pwm=200;
+      xbee.println(String(lecturaCorriente) + ":" + "3"+":"+String((velocidadA)/2));
+    }
+    else if(rx==w){
       //Movimiento hacia adelante
       moverAdelante();
     }
@@ -157,13 +170,17 @@ void loop(){
       procesarSensores();
     }
     else{
-      
+      if(movimiento){
+        if(atras){
+          verificarAtras();
+        }
+      }
     }
     
   }
   
   else{
-    xbee.println(String(lecturaCorriente) + ":" + "SC"+":");
+    xbee.println(String(lecturaCorriente) + ":" + "SC"+":"+String((velocidadA)/2));
     analogWrite(E1,0);
     analogWrite(E2,0);
   }
@@ -192,7 +209,7 @@ double leerCorriente(){
    double conversion = voltajeMedido*5/1023;
    
    //Estimacion y envio
-   return (conversion - 0.427)/1.0035;
+   return (conversion - 0.2277)/0.9918;
 }
 
 //Calcula la distancia sensada por el sensor trasero,
@@ -257,10 +274,10 @@ void moverAdelante(){
   analogWrite(E1,pwm);
   analogWrite(E2,pwm);
   movimiento = 1;
-  xbee.println(String(lecturaCorriente) + ":" + "F"+":");
+  xbee.println(String(lecturaCorriente) + ":" + "F"+":"+String((velocidadA)/2));
   }
   else{
-  xbee.println(String(lecturaCorriente) + ":" + "PPE"+":");
+  xbee.println(String(lecturaCorriente) + ":" + "PPE"+":"+String((velocidadA)/2));
   }
 
 }
@@ -270,7 +287,7 @@ void moverDerecha(){
   if(lecturaUSDerecha <10){
     analogWrite(E1,0);
     analogWrite(E2,0);
-    xbee.println(String(lecturaCorriente) + ":" + "OD"+":");
+    xbee.println(String(lecturaCorriente) + ":" + "OD"+":"+String((velocidadA)/2));
   }
   else{
   digitalWrite(M1,LOW);
@@ -279,13 +296,13 @@ void moverDerecha(){
   int lecturaServoB = servoB.read();
   if(lecturaServoA==0 && lecturaServoB==0 ){
   analogWrite(E1,pwm);
-  analogWrite(E2,255);
+  analogWrite(E2,pwm+55);
   movimiento = 1;
 
-  xbee.println(String(lecturaCorriente) + ":" + "D"+":");
+  xbee.println(String(lecturaCorriente) + ":" + "D"+":"+String((velocidadA)/2));
   }
   else{
-  xbee.println(String(lecturaCorriente) + ":" + "PPE"+":");
+  xbee.println(String(lecturaCorriente) + ":" + "PPE"+":"+String((velocidadA)/2));
   }
   }
 
@@ -296,7 +313,7 @@ void moverIzquierda(){
   if(lecturaUSIzquierda <10){
     analogWrite(E1,0);
     analogWrite(E2,0);
-    xbee.println(String(lecturaCorriente) + ":" + "OI"+":");
+    xbee.println(String(lecturaCorriente) + ":" + "OI"+":"+String((velocidadA)/2));
   }
   else{
   
@@ -306,14 +323,14 @@ void moverIzquierda(){
   int lecturaServoA = servoA.read();
   int lecturaServoB = servoB.read();
   if(lecturaServoA==0 && lecturaServoB==0 ){
-  analogWrite(E1,255);
+  analogWrite(E1,pwm+55);
   analogWrite(E2,pwm);
   movimiento = 1;
 
-  xbee.println(String(lecturaCorriente) + ":" + "I"+":");
+  xbee.println(String(lecturaCorriente) + ":" + "I"+":"+String((velocidadA)/2));
   }
   else{
-  xbee.println(String(lecturaCorriente) + ":" + "PPE"+":");
+  xbee.println(String(lecturaCorriente) + ":" + "PPE"+":"+String((velocidadA)/2));
   }
   }
 
@@ -324,7 +341,7 @@ void moverAtras(){
   if(lecturaUSAtras <10){
     analogWrite(E1,0);
     analogWrite(E2,0);
-    xbee.println(String(lecturaCorriente) + ":" + "OT"+":");
+    xbee.println(String(lecturaCorriente) + ":" + "OT"+":"+String((velocidadA)/2));
   }
   else{
   digitalWrite(M1,LOW);
@@ -335,10 +352,11 @@ void moverAtras(){
   analogWrite(E1,pwm);
   analogWrite(E2,pwm);
   movimiento = 1;
-  xbee.println(String(lecturaCorriente) + ":" + "B"+":");
+  atras = 1;
+  xbee.println(String(lecturaCorriente) + ":" + "B"+":"+String((velocidadA)/2));
   }
   else{
-  xbee.println(String(lecturaCorriente) + ":" + "PPE"+":");
+  xbee.println(String(lecturaCorriente) + ":" + "PPE"+":"+String((velocidadA)/2));
   }
   }
 
@@ -350,12 +368,12 @@ void recoger(){
      if(lecturaServo==0)
      {
        servoA.write(180);
-       xbee.println(String(lecturaCorriente) + ":" + "R"+":");
+       xbee.println(String(lecturaCorriente) + ":" + "R"+":"+String((velocidadA)/2));
      }
       else
       {
       servoA.write(0);
-      xbee.println(String(lecturaCorriente) + ":" + "MR"+":");
+      xbee.println(String(lecturaCorriente) + ":" + "MR"+":"+String((velocidadA)/2));
       }
    }
 }
@@ -366,24 +384,24 @@ void depositar(){
      if(lecturaServo==0)
      {
        servoB.write(180);
-       xbee.println(String(lecturaCorriente) + ":" + "DP"+":");
+       xbee.println(String(lecturaCorriente) + ":" + "DP"+":"+String((velocidadA)/2));
      }
       else
       {
       servoB.write(0);
-      xbee.println(String(lecturaCorriente) + ":" + "MB"+":");
+      xbee.println(String(lecturaCorriente) + ":" + "MB"+":"+String((velocidadA)/2));
       }
    }
 }
 
 void contarVueltasA(){
   int val = analogRead(sensorInfrarrojoA);
-  if(val>500 && tA){
+  if(val>400 && tA){
   cuentaA++;
   tA = 0;
   }
               
-  if(val<100){
+  if(val<250){
     tA=1;
   }
   
@@ -391,12 +409,12 @@ void contarVueltasA(){
 
 void contarVueltasB(){
   int val = analogRead(sensorInfrarrojoB);
-  if(val>500 && tB){
+  if(val>400 && tB){
   cuentaB++;
   tB = 0;
   }
               
-  if(val<100){
+  if(val<250){
     tB=1;
   }
   
@@ -408,12 +426,12 @@ void posicionarPala(){
      if(lecturaServo==0)
      {
        servoB.write(25);
-       xbee.println(String(lecturaCorriente) + ":" + "U"+":");
+       xbee.println(String(lecturaCorriente) + ":" + "U"+":"+String((velocidadA)/2));
      }
       else
       {
       servoB.write(0);
-      xbee.println(String(lecturaCorriente) + ":" + "MU"+":");
+      xbee.println(String(lecturaCorriente) + ":" + "MU"+":"+String((velocidadA)/2));
       }
    }
 }
@@ -446,6 +464,17 @@ void procesarSensores(){
   
   xbee.println(respuesta);
 
+}
+
+void verificarAtras(){
+  lecturaUSAtras = leerSensorTrasero();
+  if(lecturaUSAtras <10){
+    analogWrite(E1,0);
+    analogWrite(E2,0);
+    atras = 0;
+    xbee.println(String(lecturaCorriente) + ":" + "OT"+":"+String((velocidadA)/2));
+  }
+  else{}
 }
 
 

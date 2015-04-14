@@ -10,6 +10,6 @@ void loop() {
    double voltajeMedido = analogRead(sensorCorriente);
    double conversion = voltajeMedido*5/1023;
    
-   Serial.print("Voltaje Medido: "+String(conversion));
-
+   Serial.println("Voltaje Medido: "+String(conversion));
+    delay(1000);
 }
