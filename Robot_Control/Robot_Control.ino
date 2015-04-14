@@ -133,38 +133,16 @@ void loop(){
   
   
   char rx = recepcionRX();
-  
-  lecturaCorriente = leerCorriente();
-  lecturaUSIzquierda = leerSensorIzquierdo();
-  lecturaUSDerecha = leerSensorDerecho();
-  lecturaUSAtras = leerSensorTrasero();
-  
-  if(lecturaUSDerecha <10){
-    xbee.println(String(lecturaCorriente) + ":" + "OD"+":");
-  }
-  else{
-    xbee.println(String(lecturaCorriente) + ":" + "LD"+":");
-  }
-  if(lecturaUSIzquierda <10){
-    xbee.println(String(lecturaCorriente) + ":" + "OI"+":");
-  }
-  else{
-    xbee.println(String(lecturaCorriente) + ":" + "LI"+":");
-  }
-  if(lecturaUSAtras <10){
-    xbee.println(String(lecturaCorriente) + ":" + "OT"+":");
-  }
-  else{
-    xbee.println(String(lecturaCorriente) + ":" + "LA"+":");
-  }
-  if(lecturaCorriente <= 2.5){
-    xbee.println(String(lecturaCorriente) + ":" + "CO"+":");
-    if(rx==w){
+    
+  lecturaCorriente  = leerCorriente();
+  if(lecturaCorriente <= 4){
+    //xbee.println(String(lecturaCorriente) + ":" + "CO"+":");
+    if(rx == w){
     //Movimiento hacia adelante
     conversionVelocidad();
     moverAdelante();
     }
-    else if(rx==d){
+    else if(rx == d){
       //Movimiento hacia la derecha
       conversionVelocidad();
       moverDerecha();
@@ -196,6 +174,9 @@ void loop(){
     else if(rx==u){
     //Pone la pala en posicion de recoger
     posicionarPala();
+  }
+  else{
+    
   }
  }
  else{
@@ -301,6 +282,7 @@ void moverAdelante(){
 }
 
 void moverDerecha(){
+  lecturaUSDerecha = leerSensorDerecho();
   if(lecturaUSDerecha <10){
     analogWrite(E1,0);
     analogWrite(E2,0);
@@ -326,6 +308,7 @@ void moverDerecha(){
 }
 
 void moverIzquierda(){
+  lecturaUSIzquierda = leerSensorIzquierdo();
   if(lecturaUSIzquierda <10){
     analogWrite(E1,0);
     analogWrite(E2,0);
@@ -351,6 +334,7 @@ void moverIzquierda(){
 }
 
 void moverAtras(){
+  lecturaUSAtras = leerSensorTrasero();
   if(lecturaUSAtras <10){
     analogWrite(E1,0);
     analogWrite(E2,0);
@@ -397,7 +381,7 @@ void depositar(){
      if(lecturaServo==0)
      {
        servoB.write(180);
-       xbee.println(String(lecturaCorriente) + ":" + "B"+":");
+       xbee.println(String(lecturaCorriente) + ":" + "DP"+":");
      }
       else
       {
@@ -457,6 +441,38 @@ void posicionarPala(){
       xbee.println(String(lecturaCorriente) + ":" + "MU"+":");
       }
    }
+}
+
+void leerSensores(){
+  lecturaCorriente = leerCorriente();
+  lecturaUSIzquierda = leerSensorIzquierdo();
+  lecturaUSDerecha = leerSensorDerecho();
+  lecturaUSAtras = leerSensorTrasero();
+}
+
+void procesarSensores(){
+  String respuesta = String(lecturaCorriente)+":Z:";
+  if(lecturaUSDerecha <10){
+    respuesta += "O:";
+  }
+  else{
+    respuesta += "L:";
+  }
+
+  if(lecturaUSAtras <10){
+    respuesta += "O:";
+  }
+  else{
+    respuesta += "L:";
+  }
+    if(lecturaUSIzquierda <10){
+    respuesta += "O";
+  }
+  else{
+     respuesta += "L";
+  }
+  
+  xbee.println(respuesta);
 }
 
 
