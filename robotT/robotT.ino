@@ -80,7 +80,7 @@ SimpleTimer timer;
 char movimiento = 0;
 char tA=0;
 char tB=0;
-
+char direccion=0;
 
 //Inicializacion de elementos
 
@@ -119,11 +119,12 @@ void loop(){
       analogWrite(E1,0);
       analogWrite(E2,0);
       movimiento = 0;
+      direccion = 0;
       xbee.println(String(lecturaCorriente) + ":" + "P"+":");
     }
     
   lecturaCorriente = leerCorriente();  
-  if(lecturaCorriente <= 4){
+  if(0 <= 4){
 
     if(rx==w){
       //Movimiento hacia adelante
@@ -157,9 +158,23 @@ void loop(){
       procesarSensores();
     }
     else{
-      
+        if(movimiento){
+
+          if(direccion ==3)
+          {
+             lecturaUSAtras = leerSensorTrasero();
+              if(lecturaUSAtras <10){
+                analogWrite(E1,0);
+                analogWrite(E2,0);
+                movimiento =0;
+                direccion = 0;                
+                xbee.println(String(lecturaCorriente) + ":" + "OT"+":");
+              } 
+          }
+         
+          
+        }
     }
-    
   }
   
   else{
@@ -335,6 +350,7 @@ void moverAtras(){
   analogWrite(E1,pwm);
   analogWrite(E2,pwm);
   movimiento = 1;
+  direccion = 3;
   xbee.println(String(lecturaCorriente) + ":" + "B"+":");
   }
   else{
@@ -447,10 +463,6 @@ void procesarSensores(){
   xbee.println(respuesta);
 
 }
-
-
-
-
 
 
 
